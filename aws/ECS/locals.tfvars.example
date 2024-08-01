@@ -1,0 +1,6 @@
+flow_version = "next"
+flow_persist_results = true
+flow_persist_remote_call_responses = false
+
+domain_name = "flow.local"
+flow_workspace_git_url = "https://gitlab.com/vyne/test-workspace.git"
