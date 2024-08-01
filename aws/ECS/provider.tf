@@ -1,6 +1,6 @@
 provider "aws" {
   profile = "flow"
-  region = var.region
+  region  = var.region
 }
 
 terraform {

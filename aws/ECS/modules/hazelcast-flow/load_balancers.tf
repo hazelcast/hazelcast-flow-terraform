@@ -1,111 +1,134 @@
 resource "aws_security_group" "alb" {
-   name   = "alb-${var.system_name}-${var.environment}"
-   vpc_id = var.vpc_id
+  name   = "alb-${var.system_name}-${var.environment}"
+  vpc_id = var.vpc_id
 
-   ingress {
-      protocol    = "-1"
-      from_port   = 0
-      to_port     = 0
-      cidr_blocks = ["0.0.0.0/0"]
-   }
+  ingress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
-resource "aws_alb" "main" {
-   name            = "alb-${var.system_name}-${var.environment}"
-   internal        = false
-   security_groups = [var.external_connectivity_security_group_id, aws_security_group.alb.id]
-   subnets         = var.subnets
+resource "aws_alb" "flow" {
+  name            = "alb-flow-${var.system_name}-${var.environment}"
+  internal        = false
+  security_groups = [var.external_connectivity_security_group_id, aws_security_group.alb.id]
+  subnets         = var.subnets
+}
+
+resource "aws_alb" "mc" {
+  name            = "alb-mc-${var.system_name}-${var.environment}"
+  internal        = false
+  security_groups = [var.external_connectivity_security_group_id, aws_security_group.alb.id]
+  subnets         = var.subnets
 }
 
 # Enables HTTPS
-resource "aws_lb_listener" "redirect_http_to_https" {
-   load_balancer_arn = aws_alb.main.arn
-   port              = 80
-   protocol          = "HTTP"
+resource "aws_lb_listener" "flow_redirect_http_to_https" {
+  load_balancer_arn = aws_alb.flow.arn
+  port              = 80
+  protocol          = "HTTP"
 
-   default_action {
-      type = "redirect"
+  default_action {
+    type = "redirect"
 
-      redirect {
-         port        = "443"
-         protocol    = "HTTPS"
-         status_code = "HTTP_301"
-      }
-   }
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener" "mc_redirect_http_to_https" {
+  load_balancer_arn = aws_alb.mc.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
 }
 
 resource "aws_wafv2_web_acl" "external" {
-   name  = "ExternalACL_${var.system_name}-${var.environment}"
-   scope = "REGIONAL"
+  name  = "ExternalACL_${var.system_name}-${var.environment}"
+  scope = "REGIONAL"
 
-   default_action {
-      allow {}
-   }
+  default_action {
+    allow {}
+  }
 
-   rule {
-      name     = "AWS-AWSManagedRulesCommonRuleSet"
-      priority = 1
+  rule {
+    name     = "AWS-AWSManagedRulesCommonRuleSet"
+    priority = 1
 
-      override_action {
-         count {}
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
       }
+    }
 
-      statement {
-         managed_rule_group_statement {
-            name        = "AWSManagedRulesCommonRuleSet"
-            vendor_name = "AWS"
-         }
-      }
-
-      visibility_config {
-         cloudwatch_metrics_enabled = true
-         metric_name                = "alb_waf_${var.system_name}-${var.environment}"
-         sampled_requests_enabled   = false
-      }
-   }
-
-   rule {
-      name     = "AWS-AWSManagedRulesBotControlRuleSet"
-      priority = 2
-
-      override_action {
-         count {}
-      }
-
-      statement {
-         managed_rule_group_statement {
-            name        = "AWSManagedRulesBotControlRuleSet"
-            vendor_name = "AWS"
-         }
-      }
-
-      visibility_config {
-         cloudwatch_metrics_enabled = true
-         metric_name                = "alb_waf_${var.system_name}_${var.environment}"
-         sampled_requests_enabled   = false
-      }
-   }
-
-   visibility_config {
+    visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "ExternalACL"
+      metric_name                = "alb_waf_${var.system_name}-${var.environment}"
       sampled_requests_enabled   = false
-   }
+    }
+  }
+
+  rule {
+    name     = "AWS-AWSManagedRulesBotControlRuleSet"
+    priority = 2
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesBotControlRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "alb_waf_${var.system_name}_${var.environment}"
+      sampled_requests_enabled   = false
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "ExternalACL"
+    sampled_requests_enabled   = false
+  }
 }
 
 resource "aws_wafv2_web_acl_association" "acl-association" {
-   resource_arn = aws_alb.main.arn
-   web_acl_arn  = aws_wafv2_web_acl.external.arn
+  resource_arn = aws_alb.flow.arn
+  web_acl_arn  = aws_wafv2_web_acl.external.arn
 }
 
 resource "aws_cloudwatch_log_group" "wafv2-log-group" {
-   name              = "aws-waf-logs-${var.system_name}/${var.environment}"
-   retention_in_days = 90
+  name              = "aws-waf-logs-${var.system_name}/${var.environment}"
+  retention_in_days = 90
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logging_configuration" {
-   log_destination_configs = [aws_cloudwatch_log_group.wafv2-log-group.arn]
-   resource_arn            = aws_wafv2_web_acl.external.arn
-   depends_on              = [aws_cloudwatch_log_group.wafv2-log-group]
+  log_destination_configs = [aws_cloudwatch_log_group.wafv2-log-group.arn]
+  resource_arn            = aws_wafv2_web_acl.external.arn
+  depends_on              = [aws_cloudwatch_log_group.wafv2-log-group]
 }
 

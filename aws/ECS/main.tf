@@ -64,11 +64,11 @@ module "hazelcast_flow" {
   database_password                       = aws_db_instance.flow-db.password
   database_port                           = aws_db_instance.flow-db.port
   flow_version                            = var.flow_version
-  flow_workspace_git_branch            = var.flow_workspace_git_branch
-  flow_workspace_git_url               = var.flow_workspace_git_url
-  flow_workspace_git_path              = var.flow_workspace_git_path
+  flow_workspace_git_branch               = var.flow_workspace_git_branch
+  flow_workspace_git_url                  = var.flow_workspace_git_url
+  flow_workspace_git_path                 = var.flow_workspace_git_path
 
-  depends_on                              = [
+  depends_on = [
     aws_internet_gateway.main
   ]
 }
@@ -86,7 +86,7 @@ resource "random_string" "database_instance_suffix" {
 resource "aws_db_subnet_group" "flow-platform" {
   name       = "${var.system_name}-${var.environment}"
   subnet_ids = local.subnet_ids
-  tags       = {
+  tags = {
     Name = "Flow ${var.system_name} DB subnet group"
   }
 }
@@ -103,9 +103,9 @@ resource "aws_security_group" "database" {
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
     cidr_blocks = [
       "0.0.0.0/0"
     ]
@@ -125,7 +125,7 @@ resource "aws_db_instance" "flow-db" {
   backup_retention_period   = 7
   multi_az                  = false
   storage_encrypted         = false
-  vpc_security_group_ids    = [
+  vpc_security_group_ids = [
     aws_security_group.database.id
   ]
   tags = {
