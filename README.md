@@ -15,9 +15,9 @@ Before you begin, ensure you have the following prerequisites installed:
 ## Contributing
 We welcome contributions to extend the deployment scripts to support additional cloud environments. Please follow these steps to contribute:
 
-Fork the repository.
-Create a new branch for your feature or bugfix.
-Make your changes and commit them with descriptive messages.
-Push your changes to your fork and create a pull request.
-Please ensure that your code adheres to the established coding standards and includes appropriate documentation.
+Fork the repository.  
+Create a new branch for your feature or bugfix.  
+Make your changes and commit them with descriptive messages.  
+Push your changes to your fork and create a pull request.  
+Please ensure that your code adheres to the established coding standards and includes appropriate documentation.  
 
