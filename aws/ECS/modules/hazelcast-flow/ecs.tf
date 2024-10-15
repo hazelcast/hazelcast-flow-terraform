@@ -106,7 +106,7 @@ module "mc" {
     MC_LICENSE = data.aws_secretsmanager_secret.mc_license.arn
   }
   environment_variables = {
-    JAVA_OPTS                  = "-Dhazelcast.mc.flow.address=https://${var.domain_name}/flow -Dhazelcast.mc.flow.internalAddress=http://flow-${var.system_name}.${var.service_discovery_domain}:9021"
+    JAVA_OPTS                  = "-Dhazelcast.mc.flow.addresses=https://${var.domain_name}/flow -Dhazelcast.mc.flow.internalAddress=http://flow-${var.system_name}.${var.service_discovery_domain}:9021"
     MC_DEFAULT_CLUSTER         = "flow"
     MC_DEFAULT_CLUSTER_MEMBERS = "flow-${var.system_name}.${var.service_discovery_domain}:25701"
     MC_INIT_CMD                = "./bin/mc-conf.sh security reset && ./bin/mc-conf.sh dev-mode configure"
