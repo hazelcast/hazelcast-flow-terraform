@@ -21,6 +21,7 @@ resource "aws_acm_certificate" "cert" {
 
 data "aws_route53_zone" "primary" {
   name = var.domain_name
+  #private_zone = true
 }
 
 resource "aws_route53_record" "cert_validation" {
@@ -67,6 +68,7 @@ module "hazelcast_flow" {
   flow_workspace_git_branch               = var.flow_workspace_git_branch
   flow_workspace_git_url                  = var.flow_workspace_git_url
   flow_workspace_git_path                 = var.flow_workspace_git_path
+  mc_version                              = var.mc_version
 
   depends_on = [
     aws_internet_gateway.main

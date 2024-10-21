@@ -87,7 +87,7 @@ module "mc" {
   region                    = var.region
   vpc_id                    = var.vpc_id
   subnets                   = var.subnets
-  image                     = "docker.io/hazelcast/management-center-flow:${var.flow_version}"
+  image                     = "docker.io/hazelcast/management-center-flow:${var.mc_version}"
   task_definition_cpu       = 1024
   task_definition_memory    = 2048
   port                      = 8080

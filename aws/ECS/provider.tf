@@ -1,11 +1,9 @@
 provider "aws" {
-  profile = "flow"
+  #profile = "flow"
   region  = var.region
 }
 
 terraform {
-  backend "http" {
-  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
