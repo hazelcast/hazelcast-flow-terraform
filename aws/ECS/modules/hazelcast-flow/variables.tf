@@ -100,6 +100,11 @@ variable "flow_version" {
   description = "The version / tag of Flow"
 }
 
+variable "mc_version" {
+  type        = string
+  description = "The version / tag of Management Center"
+}
+
 // Application configuration
 variable "flow_persist_results" {
   type        = bool

@@ -32,7 +32,7 @@ terraform init
 
 The deployment can be customized using Terraform variables. These variables can be set in a terraform.tfvars file or passed directly via the command line.
 
-Copy `locals.tfvars.examples` and configure with any variables you wish to tweak.
+Copy `locals.tfvars.example` and configure with any variables you wish to tweak.
 
 ### AWS Credentials
 Ensure that your AWS CLI is configured with the necessary credentials:

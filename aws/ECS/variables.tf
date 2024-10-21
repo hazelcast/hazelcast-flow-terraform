@@ -40,6 +40,12 @@ variable "flow_version" {
   default     = "latest"
 }
 
+variable "mc_version" {
+  type        = string
+  description = "The version / tag of Management Center"
+  default     = "latest"
+}
+
 // Application configuration
 variable "flow_persist_results" {
   type        = bool

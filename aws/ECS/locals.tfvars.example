@@ -1,4 +1,5 @@
-flow_version = "next"
+flow_version = "latest"
+mc_version = "latest"
 flow_persist_results = true
 flow_persist_remote_call_responses = false
 
